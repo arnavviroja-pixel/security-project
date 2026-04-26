@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Identity Theft Awareness - Pro Edition</title>
+<style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin:0; background:#eef2f7; color: #333; }
+    header { background:#2c3e50; color:white; padding:30px; text-align:center; }
+    section { max-width: 800px; margin: 20px auto; padding:20px; background:white; border-radius:10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    
+    /* UI Elements */
+    button { padding:10px 15px; margin:5px; cursor:pointer; border: none; border-radius: 5px; background: #3498db; color: white; transition: 0.3s; }
+    button:hover { background: #2980b9; }
+    input { padding: 10px; width: 70%; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 10px; }
+
+    /* Password Meter Styles */
+    .meter-container { margin-top: 10px; background: #ddd; height: 10px; border-radius: 5px; width: 100%; overflow: hidden; }
+    #meterFill { height: 100%; width: 0%; transition: width 0.5s, background-color 0.5s; }
+    .weak { background-color: #ff4d4d; }
+    .medium { background-color: #ffa500; }
+    .strong { background-color: #2ecc71; }
+
+    /* Feedback Colors */
+    #feedback, #quizFeedback, #passwordResult { font-weight: bold; margin-top: 10px; }
+    .correct-text { color: #2ecc71; }
+    .wrong-text { color: #e74c3c; }
+    
+    ul { line-height: 1.6; }
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>Identity Theft Awareness</h1>
+    <p>Learn how to protect yourself from scams</p>
+</header>
+
+<section>
+    <h2>What is Identity Theft?</h2>
+    <p>Identity theft happens when someone steals your personal information like your name, passwords, or credit card details and uses it without permission.</p>
+
+    <h3>Common Types:</h3>
+    <ul>
+        <li>Phishing emails</li>
+        <li>Fake websites</li>
+        <li>Data breaches</li>
+        <li>Social engineering</li>
+    </ul>
+
+    <h3>Real-Life Examples:</h3>
+    <ul>
+        <li>Someone opens a credit card in your name</li>
+        <li>Hackers access your social media account</li>
+        <li>A scammer pretends to be your bank</li>
+    </ul>
+
+    <h3>Warning Signs:</h3>
+    <ul>
+        <li>Unfamiliar charges on your account</li>
+        <li>Passwords suddenly stop working</li>
+        <li>You receive alerts for accounts you didn’t create</li>
+    </ul>
+
+    <h3>How to Stay Safe:</h3>
+    <ul>
+        <li>Use strong passwords</li>
+        <li>Enable two-factor authentication</li>
+        <li>Avoid suspicious links</li>
+        <li>Check for HTTPS</li>
+        <li>Never share personal information online</li>
+    </ul>
+</section>
+
+<section>
+    <h2>🎮 Spot the Scam (Advanced)</h2>
+    <p>Pay close attention to URLs and sender details!</p>
+    <p id="levelText"></p>
+    <div id="game"></div>
+    <p id="feedback"></p>
+</section>
+
+<section>
+    <h2>🔐 Real-Time Password Security</h2>
+    <div style="position: relative;">
+        <input type="password" id="passwordInput" placeholder="Create a password..." oninput="checkPassword()">
+        <button onclick="toggleVisibility()" style="background:#7f8c8d; font-size: 12px; width: auto; padding: 10px;">Show/Hide</button>
+    </div>
+    <div class="meter-container">
+        <div id="meterFill"></div>
+    </div>
+    <p id="passwordResult">Strength: None</p>
+</section>
+
+<section>
+    <h2>🧠 Quick Quiz</h2>
+    <p id="quizQ"></p>
+    <div id="quizBtns"></div>
+    <p id="quizFeedback"></p>
+</section>
+
+<section>
+    <h2>🔗 Resources</h2>
+    <ul>
+        <li><a href="https://www.identitytheft.gov" target="_blank">IdentityTheft.gov</a></li>
+        <li><a href="https://consumer.ftc.gov" target="_blank">FTC Consumer Protection</a></li>
+        <li><a href="https://www.usa.gov/identity-theft" target="_blank">USA.gov</a></li>
+    </ul>
+</section>
+
+<script>
+// --- ADVANCED GAME SCENARIOS ---
+let levels = [
+    {t:"Email from 'support@g00gle.com' says your account is locked. Click to fix.", s:true},
+    {t:"Browser address bar shows 'https://www.chase.com/login' with a padlock icon.", s:false},
+    {t:"Text message: 'Hey! It's your cousin. I'm stuck abroad and need $200 via gift card immediately.'", s:true},
+    {t:"A popup says: 'Your PC is infected! Call 1-800-SCAN-NOW to fix it.'", s:true},
+    {t:"Login page at 'microsoft-security-update.net' asking for your Outlook password.", s:true}
+];
+
+let level = 0;
+
+function loadGame(){
+    document.getElementById("levelText").innerText = "Challenge " + (level+1) + " of " + levels.length;
+    document.getElementById("feedback").innerText = "";
+    document.getElementById("game").innerHTML = `
+        <div style="background: #f9f9f9; padding: 15px; border-left: 5px solid #3498db; margin-bottom: 10px;">
+            <p><strong>Scenario:</strong> ${levels[level].t}</p>
+        </div>
+        <button onclick="checkGame(true)" style="background:#e74c3c">Report as Scam</button>
+        <button onclick="checkGame(false)" style="background:#2ecc71">Trust as Safe</button>
+    `;
+}
+
+function checkGame(choice){
+    let correct = levels[level].s;
+    let fb = document.getElementById("feedback");
+
+    if(choice === correct){
+        fb.innerText = "Nice catch! That was indeed " + (correct ? "a scam." : "safe.");
+        fb.className = "correct-text";
+        level++;
+        if(level < levels.length){
+            setTimeout(loadGame, 1500);
+        } else {
+            document.getElementById("game").innerHTML = "<h3>Shields Up! You passed all security checks.</h3>";
+        }
+    } else {
+        fb.innerText = "Careful! Look closer at the details and try again.";
+        fb.className = "wrong-text";
+    }
+}
+
+// --- REAL-TIME PASSWORD LOGIC ---
+function checkPassword(){
+    let p = document.getElementById("passwordInput").value;
+    let meter = document.getElementById("meterFill");
+    let result = document.getElementById("passwordResult");
+    let strength = 0;
+
+    if (p.length > 7) strength++;
+    if (/[A-Z]/.test(p)) strength++;
+    if (/[0-9]/.test(p)) strength++;
+    if (/[^A-Za-z0-9]/.test(p)) strength++;
+
+    meter.className = ""; 
+    if (p.length === 0) {
+        meter.style.width = "0%";
+        result.innerText = "Strength: None";
+    } else if (strength <= 1) {
+        meter.style.width = "25%";
+        meter.classList.add("weak");
+        result.innerText = "Strength: Weak";
+    } else if (strength <= 3) {
+        meter.style.width = "60%";
+        meter.classList.add("medium");
+        result.innerText = "Strength: Medium";
+    } else {
+        meter.style.width = "100%";
+        meter.classList.add("strong");
+        result.innerText = "Strength: Strong!";
+    }
+}
+
+function toggleVisibility() {
+    let input = document.getElementById("passwordInput");
+    input.type = (input.type === "password") ? "text" : "password";
+}
+
+// --- QUIZ LOGIC ---
+let quiz = [
+    {q:"Strong passwords should include symbols", a:true},
+    {q:"Clicking random links is safe", a:false},
+    {q:"HTTPS means a site is more secure", a:true}
+];
+let qi = 0;
+
+function loadQuiz(){
+    document.getElementById("quizFeedback").innerText = "";
+    let q = quiz[qi];
+    document.getElementById("quizQ").innerText = q.q;
+    document.getElementById("quizBtns").innerHTML = `
+        <button onclick="checkQuiz(true)">True</button>
+        <button onclick="checkQuiz(false)">False</button>
+    `;
+}
+
+function checkQuiz(choice){
+    let fb = document.getElementById("quizFeedback");
+    if(choice === quiz[qi].a){
+        fb.innerText = "Correct!";
+        fb.className = "correct-text";
+        qi++;
+        if(qi < quiz.length) setTimeout(loadQuiz, 1000);
+        else {
+            document.getElementById("quizQ").innerText = "Quiz complete!";
+            document.getElementById("quizBtns").innerHTML = "";
+        }
+    } else {
+        fb.innerText = "Try again!";
+        fb.className = "wrong-text";
+    }
+}
+
+loadGame();
+loadQuiz();
+</script>
+
+</body>
+</html>
